@@ -1,20 +1,16 @@
-function res = H2helmholtz(T,v,par,degree)
-% Helmholts free energy of hydrogen, plus derivatives up to given degree
+function res = H2helmholtz(T,v,max_order)
+% Helmholtz molar free energy and partial derivatives for pure hydrogen
 %  T:   Temperature (K)
 %  v:   Molar volume (m3/kmol)
 %  par: Model paramters struct
-%  degreee: Highest degree of partial derivatives. Default: 2, Max: 3
+%  max_order: Highest order of partial derivatives. Default: 2, Max: 3
 % Model from Leachman, J.W. et al., 
 %       J. Physical and Chemical Reference Data,vol. 38, p721 (2009)
 
-  if nargin < 4
-    degree = 2;
-  end
   if nargin < 3
-    par = H2parameters;
-  elseif isempty(par)
-    par = H2parameters;
+    max_order = 2;
   end
+  par = H2parameters;
 
   % Reduced temperature and density:
   tau = par.Tc/T;
@@ -26,10 +22,10 @@ function res = H2helmholtz(T,v,par,degree)
   delta_vvv = -6/(v^4*par.rhoc);
 
   % Ideal gas contribution
-  res_ig = a_ig(tau,delta,par,degree);
+  res_ig = a_ig(tau,delta,par,max_order);
 
   % Residual contribution
-  res_r = ar(tau,delta,par,degree);
+  res_r = ar(tau,delta,par,max_order);
 
   res = res_ig + res_r;
 
@@ -40,7 +36,7 @@ function res = H2helmholtz(T,v,par,degree)
   a_tt = res(4);
   a_td = res(5);
   a_dd = res(6);
-  if degree > 2
+  if max_order > 2
     a_ttt = res(7);
     a_ttd = res(8);
     a_tdd = res(9);
@@ -57,7 +53,7 @@ function res = H2helmholtz(T,v,par,degree)
   f_Tv = R*(a_d*delta_v + T*a_td*tau_T*delta_v);
   f_vv = R*T*(a_dd*delta_v^2 + a_d*delta_vv);
   res = [f,f_T,f_v,f_TT,f_Tv,f_vv];
-  if degree > 2
+  if max_order > 2
     f_TTT = R*(a_tt*tau_T^2 + T*a_ttt*tau_T^3 + 2*T*a_tt*tau_T*tau_TT);
     f_TTv = R*T*a_ttd*tau_T^2*delta_v;
     f_Tvv = R*(a_dd*delta_v^2 + T*a_tdd*delta_v^2*tau_T + a_d*delta_vv ...
@@ -68,7 +64,7 @@ function res = H2helmholtz(T,v,par,degree)
   end
 end
 
-function res = a_ig(tau,delta,par,degree)
+function res = a_ig(tau,delta,par,max_order)
 % Reduced ideal gas Helmholtz free energy with derivatives
 % Ref.: Leachman, J.W. et al., 
 %       J. Physical and Chemical Reference Data,vol. 38, p721 (2009)
@@ -82,14 +78,14 @@ function res = a_ig(tau,delta,par,degree)
   a_dd = -delta^(-2);
   a_Td = 0;
   res = [a,a_T,a_d,a_TT,a_Td,a_dd];
-  if degree > 2
+  if max_order > 2
     a_TTT = 3/tau^3-(A.*B.^3)'*(y.*(1+y)./(1-y).^3);
     a_ddd = 2*delta^(-3);
     res = [res,a_TTT,0,0,a_ddd];
   end
 end
 
-function res = ar(tau,delta,par,degree)
+function res = ar(tau,delta,par,max_order)
 % Reduced residual Helmholtz free energy a with derivatives
 % Ref.: Leachman, J.W. et al., 
 %       J. Physical and Chemical Reference Data,vol. 38, p721 (2009)
@@ -148,7 +144,7 @@ function res = ar(tau,delta,par,degree)
   S3_dd = sum(s_dd(i3).*o + 2*s_d(i3).*o_d + s(i3).*o_dd);
   res3 = [S3,S3_t,S3_d,S3_tt,S3_td,S3_dd];
 
-  if degree > 2
+  if max_order > 2
     s_ttt = s_tt.*(t-2)/tau;
     s_ttd = s_tt.*d/delta;
     s_tdd = s_dd.*t/tau;
