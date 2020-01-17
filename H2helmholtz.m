@@ -1,11 +1,16 @@
 function res = H2helmholtz(T,v,max_order)
-% Helmholtz molar free energy and partial derivatives for pure hydrogen
+% Helmholtz molar free energy (f) and partial derivatives for pure hydrogen
+% Input:
 %  T:   Temperature (K)
 %  v:   Molar volume (m3/kmol)
-%  par: Model paramters struct
 %  max_order: Highest order of partial derivatives. Default: 2, Max: 3
-% Model from Leachman, J.W. et al., 
-%       J. Physical and Chemical Reference Data,vol. 38, p721 (2009)
+% Output:
+%   res_out = [f,f_T,f_v,f_TT,f_Tv,f_vv]  (f_xy = d^2f/dxdy)
+%    if max_order = 3: res_out = [res_out,f_TTT,f_TTv,f_Tvv,f_vvv]
+% 
+% Ref: Leachman, J.W. et al., J. Phys. Chem. Reference Data 38, p721 (2009)
+%   pdf available from researchgate.net
+%   Search Google Scholar for: Leachman Fundamental Equations of State
 
   if nargin < 3
     max_order = 2;
