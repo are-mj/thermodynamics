@@ -17,3 +17,5 @@ Both models are the same as used by NIST for calculating Thermophysical Properti
 thermo.m:  Thermodynamic object that contains methods and properties that enable the calculation of thermodynamic variables and processes.
 
 Use the Matlab help command for details (e.g. help CO2helmholtz)
+
+[![View H2 and CO2 thermodynamics on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://se.mathworks.com/matlabcentral/fileexchange/73950-h2-and-co2-thermodynamics)
