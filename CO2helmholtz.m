@@ -11,6 +11,7 @@ function res_out = CO2helmholtz(T,v,max_order)
 % Ref.: Span and Wagner, J. Phys. Chem. Reference Data 25, 1509 (1996)
 %  https://doi.org/10.1063/1.555991
 % 
+% Requires: CO2parameters.m
 
 % January 2020, Are Mjaavatten
 

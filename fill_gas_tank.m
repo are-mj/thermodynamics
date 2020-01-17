@@ -1,5 +1,5 @@
 function [t,T,N,p] = fill_gas_tank(th,tank,T0,p0,T_up,p_up,Ta,w,p_final)
-% Simulate the filling of a gas tank from a constant gas reservoir
+% Simulate the filling of a gas tank from a constant T and p gas reservoir
 %  Input:
 %   th       : Thermodynamic object
 %   tank     : Paramteter struct for the tank

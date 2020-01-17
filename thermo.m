@@ -1,5 +1,5 @@
 classdef thermo < handle
-  %THERMO: Class for point values of molar thermodynamic variables for H2
+  %THERMO: Class for point values of molar thermodynamic variables
   % Calculates molar Helmholtz free energy with partial derivatives with
   % respect to temperature T and molar volume v of orders up to three.
   % This allows explicit expressions for most thermodynamic 
@@ -7,11 +7,11 @@ classdef thermo < handle
   % Type "termo.properties" for a complete list of properties.
   % Type "thermo.methods" for a list of methods.
   %
+  % Creator function: th = thermo(species); 
+  % Currently available species:  H2, CO2
   % Uses the same H2 model as The NIST Chemistry Webbook
   % (https://webbook.nist.gov/chemistry/fluid/)
   % The results are identical within a factor 5e-5.
-  %
-  % Creator function: th = thermo 
   %
   %  The thermo object will contain a consistent set of variables 
   %  when initilalized by either of the following methods
@@ -22,27 +22,25 @@ classdef thermo < handle
   % no iterations.  Tpcalc involves iterative searches for T and v, 
   % and will converge in most cases.  
   %
-  % Ref.: Leachman, J.W. et al., 
-  %       J. Physical and Chemical Reference Data,vol. 38, p721 (2009)
-  %
-  % Are Mjaavatten, Septemeber 2019
+  % Are Mjaavatten, January 2020
   % Mjaavatten Consulting, Norway.  are@mjaavatten.com 
 
   % Lowercase letters are used for all intensive properties except
   % temperature
   
-  properties  % Parameters
-    species;  % Name of current species (e.g. 'H2')    
-    R;        % Universal gas constant (J/kmol/K)
-    Mw;       % Molar mass (kg/kmol)
-    Tc;       % Critical temperature (K)
-    pc;       % critical pressure
-    rhoc;     % critical density (kmol/m3)
-    vc;       % Critical molar volume (m3/kmol)
-    par;      % Model parameters
-    Tt;       % Triple point temperature (K)
-    pt;       % Triple point pressure (Pa)
-    max_order;   % Highest level of partial derivatives
+  properties
+    species;   % Name of current species (e.g. 'H2')    
+    R;         % Universal gas constant (J/kmol/K)
+    Mw;        % Molar mass (kg/kmol)
+    Tc;        % Critical temperature (K)
+    pc;        % critical pressure
+    rhoc;      % critical density (kmol/m3)
+    vc;        % Critical molar volume (m3/kmol)
+    par;       % Model parameters
+    Tt;        % Triple point temperature (K)
+    pt;        % Triple point pressure (Pa)
+    max_order; % Highest level of partial derivatives 
+               %  Default: 2, Maximum: 3
   end  
 
   properties  % Thermodynamic variables
@@ -66,8 +64,8 @@ classdef thermo < handle
     p_Tv;     % d2p/dTdv
     p_vv;     % d2p/dv^2
     u;        % Internal energy (j/kmol)
-    u_T;
-    u_v;
+    u_T;      % du/dT
+    u_v;      % du/dv
     cv;       % Heat capacity at constant volume (J/kmol/K)
     cp;       % Heat capacity at constant pressure (J/kmol/K)
     s;        % Entropy (J/kmol/K)
@@ -123,7 +121,7 @@ classdef thermo < handle
       end
       th.T = T;
       th.v = v;
-      res = th.helmholtz(T,v,th.par,th.max_order);
+      res = th.helmholtz(T,v,th.max_order);
       th.f = res(1);
       th.f_T = res(2);
       th.f_v = res(3);
