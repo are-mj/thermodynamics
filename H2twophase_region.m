@@ -28,11 +28,11 @@ plot(v,p28,':k')
 
 % The real isotherm has constant pressure in the two-phase region
 % Intersection points isotherm/two-phase envelope:
-[vil,pil] = polyxpoly(v_liq,ps,v,p28);
-vil = min(vil);
-[viv,piv] = polyxpoly(v_vap,ps,v,p28);
-viv = max(viv);
-piv = min(piv);
+Pl = InterX([v_liq';ps'],[v;p28]);
+vil = min(Pl(1,:));
+Pv = InterX([v_vap';ps'],[v;p28]);
+viv = max(Pv(1,:));
+piv = max(Pv(2,:));
 il = find(v < vil,1,'last');  % Highest v in liquid region
 ih = find(v > viv,1,'first'); % Lowest v in vapour region
 v_28 = [v(1:il),vil,viv,v(ih:end)];       
@@ -44,7 +44,5 @@ plot(1/th.rhoc,th.pc*1e-5,'*r')
 plot(v,p35,'--k')
 legend('Two-phase envelope','28K model pressure','28K real isotherm',...
   'Critical isotherm','Critical point','35K isotherm')
-
 axis(ax)
-
 
