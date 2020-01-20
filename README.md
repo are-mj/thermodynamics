@@ -17,3 +17,5 @@ Both models are the same as used by NIST for calculating Thermophysical Properti
 thermo.m:  Thermodynamic object that contains methods and properties that enable the calculation of thermodynamic variables and processes.
 
 Use the Matlab help command for details (e.g. help CO2helmholtz)
+
+Thanks to PS for the InterX function used in H2twophase_region and CO2twophase_region. https://www.mathworks.com/matlabcentral/fileexchange/22441
