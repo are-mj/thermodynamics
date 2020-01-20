@@ -1,6 +1,6 @@
 % CO2twophase_region.m
 % Script for creating a volume-pressure plot of the two-phase region
-clear
+
 th = thermo('CO2');
 
 % 
@@ -31,11 +31,11 @@ plot(v,p295,':k')
 
 % The real isotherm has constant pressure in the two-phase region
 % Intersection points isotherm/two-phase envelope:
-[vil,pil] = polyxpoly(v_liq,ps,v,p295);
-vil = min(vil);
-[viv,piv] = polyxpoly(v_vap,ps,v,p295);
-viv = max(viv);
-piv = min(piv);
+Pl = InterX([v_liq';ps'],[v;p295]);
+vil = min(Pl(1,:));
+Pv = InterX([v_vap';ps'],[v;p295]);
+viv = max(Pv(1,:));
+piv = max(Pv(2,:));
 
 il = find(v < vil,1,'last');  % Highest v in liquid region
 ih = find(v > viv,1,'first'); % Lowest v in vapour region
