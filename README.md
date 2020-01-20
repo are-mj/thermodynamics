@@ -18,4 +18,4 @@ thermo.m:  Thermodynamic object that contains methods and properties that enable
 
 Use the Matlab help command for details (e.g. help CO2helmholtz)
 
-Thanks to PS for the InterX function used in H2twophase_region and CO2twophase_region. https://www.mathworks.com/matlabcentral/fileexchange/22441
+Thanks to PS for the InterX function used in H2twophase_region and CO2twophase_region. https://www.mathworks.com/matlabcentral/fileexchange/22441-curve-intersections
