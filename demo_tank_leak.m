@@ -2,6 +2,10 @@ function demo_tank_leak
 % Simulation of leak from the vapour phase in a tank containing liquid H2
 % Demonstrates calculation of vapour/liquid equilibrium as well as
 % choked and subsonic flow.
+%
+% NOTE:  Liquid will condense in the escaping gas.  This effect is ignored.
+%  Corresponds to the "frozen equilibrium" assumption for two-phase orifice 
+%  flow.  Real flow rates may differ from the ones calculated here!
 
   % Parameters:
   par.Vtank = 1;             % 1 m3
