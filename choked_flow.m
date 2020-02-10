@@ -1,7 +1,7 @@
 function [T,p,c,v] = choked_flow(th,T0,p0)
-% Choked flow thermodynamic variables, given upstream stagnation conditions 
-%  and assuming isentropic flow. 
-% Input:
+% State of choked gas flow, given upstream stagnation conditions.
+%  Assumes isentropic process and no condensation
+% Input:  
 %   th   thermo object
 %   T0   Stagnation temperature (K)
 %   p0   Stagnation pressure (Pa)
@@ -20,14 +20,15 @@ function [T,p,c,v] = choked_flow(th,T0,p0)
     gamma = th.cp/th.cv;
     % The ideal gas formula is very wrong near the saturation line
     % This modifiaction seems to work fine for H2:
-    gamma = min(gamma,1.6);  
-    Tstar = T0*2/(gamma+1);
-    vstar = th.v*(T0/Tstar)^(1/(gamma+1));
-    th.Tvcalc(Tstar,vstar);
-    cstar = th.c;
-    fun = @(x) hscfun(th,x,h0,s0);
-    x0 = [Tstar;vstar;cstar];
+%     gamma = min(gamma,1.6);  
+%     Tstar = T0*2/(gamma+1);
+%     vstar = th.v*(T0/Tstar)^(1/(gamma+1));
+%     th.Tvcalc(Tstar,vstar);
+%     cstar = th.c;
     th.max_order = 3;  % Need third order derivatives for the Jacobian
+    fun = @(x) hscfun(th,x,h0,s0);
+%     x0 = [Tstar;vstar;cstar];
+    x0=[T0;th.v;th.c];
     x = newton(fun,x0);
     th.max_order = 2;
     % If this simple Newtonsolver fails, try fsolve (Optimization tlbx):
