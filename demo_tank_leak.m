@@ -25,13 +25,14 @@ function demo_tank_leak
  
   th = thermo('H2');  % thermodynamic object
 
-  [~,liq,vap] = th.saturation(T0);
-  z0 = [N0;T0;liq.v;vap.v];
+  [~,vl,vv] = th.saturation(T0);
+  z0 = [N0;T0;vl;vv];
   
   z1 = z0';  % to ensure correct starting point in flow is not choked
   t1 = 0;
 
   % Check if flow is initially choked:
+  warning('off','CHOKED_FLOW:RANGE')
   choked = sonic_gap(th,0,z0,par)>0;
   if choked  % Stage 1: Sonic flow
     % Integrate as long as flow is sonic:
@@ -90,7 +91,9 @@ function demo_tank_leak
   cleak = [c1eak1;cleak2];
   uleak = [c1eak1;uleak2];
   pleak = [pleak1;par.p_a*ones(size(t2))];
-
+  
+  warning('on','CHOKED_FLOW:RANGE')
+  
   figure;
   subplot(221);
   plot(t,[T,Tleak]);

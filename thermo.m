@@ -87,13 +87,16 @@ classdef thermo < handle
         error(['You must specify the chemical species, ', ...
           'e.g. th = thermo(''H2'')']);
       end
+      th.helmholtz = @helmholtz;
       switch species
         case 'H2'
           th.par = H2parameters;
-          th.helmholtz = @H2helmholtz;
         case 'CO2'
           th.par = CO2parameters;
-          th.helmholtz = @CO2helmholtz;
+        case 'H2O'
+          th.par = H2Oparameters;
+        otherwise
+          error('Currently available species are: H2, CO2, H2O')
       end
       % Unpack general parameters:
       th.species = th.par.species;
@@ -115,13 +118,9 @@ classdef thermo < handle
     %   T :   Temperature (K)
     %   v :   Molar volume (m3/kmol)
     
-      if ~isscalar(T)
-        v = T(2);
-        T = T(1);
-      end
       th.T = T;
       th.v = v;
-      res = th.helmholtz(T,v,th.max_order);
+      res = th.helmholtz(T,v,th.par,th.max_order);
       th.f = res(1);
       th.f_T = res(2);
       th.f_v = res(3);
@@ -150,7 +149,18 @@ classdef thermo < handle
       th.c = sqrt(v^2/th.Mw*(th.f_vv-th.f_Tv^2/th.f_TT)); %speed of sound
       th.jt = -(T*th.f_Tv/th.f_vv+v)/th.cp;  % Joule-Thompson coeff.
 
-      if th.max_order > 2
+      if th.max_order < 3  
+        if ~isempty(th.f_TTT)
+          % Erase third-order derivatives to avoid errors later
+          th.f_TTT = [];
+          th.f_TTv = [];
+          th.f_Tvv = [];
+          th.f_vvv = [];
+          th.p_TT  = [];
+          th.p_Tv  = [];
+          th.p_vv  = [];
+        end
+      else
         th.f_TTT = res(7);
         th.f_TTv = res(8);
         th.f_Tvv = res(9);
@@ -164,22 +174,25 @@ classdef thermo < handle
     function Tpcalc(th,T,p,v0)
     % Tpcalc(T,p,v0) : Solves of p(T,v) = p by Newton's method
 	  % v0: optional starting point for iteration. Default: Ideal gas value
+    if nargin < 4
+      v0 = th.R*T/p;  % Ideal gas
+    end     
       MaxIter = 25;
-      if nargin < 4
-        v0 = th.R*T/p;  % Ideal gas
-      end 
       vv = v0;
       for i = 1:MaxIter
-        th.Tvcalc(T,vv);
+        th.Tvcalc(T,vv)
         ff = th.p-p;
         if abs(ff) < 0.01
           return
         end
         J = th.p_v;
         dv = ff/J;
+        while vv - dv < 0
+          dv = dv/2;
+        end
         vv = vv - dv;
       end
-      error('No convergence for T = %6.2f, p = %10.0f',T,p);
+      error(sprintf('No convergence for T = %6.2f, p = %10.0f',T,p));
     end
 
     function phcalc(th,p,h)
@@ -247,48 +260,22 @@ classdef thermo < handle
         end
     end
 
-    function [ps,ps_T] = psat(th,T)
-    % Saturation pressure
-      if T > th.Tc
-        error('Temperature above critical')
-      end
-      if T >= th.Tt  % Vapour/liquid
-        theta = 1-T/th.Tc;
-        pp = th.par.pp;
-        ppv = polyval(pp,theta);
-        ps = exp(ppv)*th.pc;
-        ps_T = -ps*polyval(polyder(pp),theta)/th.Tc;
-      elseif isfield(th.par,'as') % data exist for sublimation line
-        theta_s = 1-T/th.Tt;
-        ss = sum(th.par.as.*theta_s.^th.par.es);
-        ex = th.Tt/T*ss;
-        ps = th.pt*exp(ex);
-        ps_T = -ps/T*(th.Tt*ss/T ...
-          +sum(th.par.as.*th.par.es.*theta_s.^(th.par.es-1)));
-      else
-        error('No model for saturation pressure below triple point')
-      end
-    end
-
-    function [ps,liq,vap] = saturation(th,T) 
-      % [ps,liq,vap] = th.saturation(T) 
-      % ps: Saturation pressure
-      % liq,vap:  converged thermo objects for liquid and vapour
-      if T<th.Tt || T>th.Tc
-        error(['Saturation properties not defined for ', ...
-          'T <%6.2f K or T >%6.2f K'],th.Tt,th.Tc);
-      end
-      ps = th.psat(T);
-      % To find the liquid and vapour solution to p(T,v) = ps we must
-      % find good (enough) starting points for th.Tpcalc:
-      theta = 1-T/th.Tc;
-      X = [1/(theta+0.01),1,theta,theta^2,theta^3];
-      vl0 = X*th.par.pvl;
-      vv0 = exp(X*th.par.pvv);
-      th.Tpcalc(T,ps,vl0);
-      liq = th.thermprops;
-      th.Tpcalc(T,ps,vv0);
-      vap = th.thermprops;      
+    function [ps,vl,vv,ps_T] = saturation(th,T)
+    % saturation(T): Values along the vapour/liquid saturation line
+    %  T:    Temperature (K)
+    %  ps:   Saturation pressure (Pa)
+    %  vl:   Saturated liquid molar volume (M3/kmol)
+    %  vv:   Saturated vapour molar volume (M3/kmol)
+    %  ps_T: Derivative of pd (dps/dT)
+      theta  = 1-T/th.Tc;
+      as = th.par.as;
+      ase = th.par.ase;
+      xx    = th.Tc/T*as*theta.^ase;
+      ps    = th.pc*exp(xx);
+      ps_T  = -ps/T*(xx+as(1) + ...
+        as(2:end)*(ase(2:end).*theta.^ase(2:end)/theta));
+      vl   = th.vc/(th.par.bs*theta.^th.par.bse);
+      vv   = th.vc*exp(th.par.cs*theta.^th.par.cse);  
     end
 
     function s = thermprops(th)
@@ -399,7 +386,7 @@ classdef thermo < handle
     function methods
     % METHODS: Displays a list of methods of the thermo class
       names = {'thermo','Tvcalc','Tpcalc','phcalc',...
-        'pscalc','psat','saturation','thermprops','properties','methods'};
+        'pscalc','saturation','thermprops','properties','methods'};
       text = {'Creator function for thermodynamic object'
         'Calculate thermo, given temperature and molar volume'
         'Calculate thermo, given temperature and pressure'

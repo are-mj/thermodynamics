@@ -12,12 +12,16 @@ function [T,p,c,v] = choked_flow(th,T0,p0)
 %   v    Molar volume  (m3/kmol)
 
 % January 2020, Are Mjaavatten
-
-    th.Tpcalc(T0,p0);
+    
+    ps = th.saturation(T0);
+%     if p0 > ps
+%       warning('CHOKED_FLOW:RANGE',...
+%         'Calculation not robust in the liquid region')
+%     end
     h0 = th.h;
     s0 = th.s;    
     % Initialize with ideal gas solution:
-    gamma = th.cp/th.cv;
+%     gamma = th.cp/th.cv;
     % The ideal gas formula is very wrong near the saturation line
     % This modifiaction seems to work fine for H2:
 %     gamma = min(gamma,1.6);  
@@ -29,7 +33,7 @@ function [T,p,c,v] = choked_flow(th,T0,p0)
     fun = @(x) hscfun(th,x,h0,s0);
 %     x0 = [Tstar;vstar;cstar];
     x0=[T0;th.v;th.c];
-    x = newton(fun,x0);
+    x = newton(fun,x0,[zeros(3,1),Inf(3,1)]);
     th.max_order = 2;
     % If this simple Newtonsolver fails, try fsolve (Optimization tlbx):
     % x = fsolve(fun,x0,optimoptions('fsolve','display','off'));
@@ -40,7 +44,7 @@ function [T,p,c,v] = choked_flow(th,T0,p0)
 end
 
 function [fun,J] = hscfun(th,x,h1,s1)
-% Residuals of stagnation enthalpy, entropy and flow speed - spped of sound
+% Residuals of stagnation enthalpy, entropy and flow speed - speed of sound
 % hscfun(x,th,h1,s1) = [0;0;0] at choking
     T = x(1);
     v = x(2);

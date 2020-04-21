@@ -7,6 +7,8 @@ function par = CO2parameters
 %      R. Span, W. Wagner,  J. Phys. Chem. Ref. Data 25, 1509 (1996);
 
   par.species = 'CO2';
+  par.casno = '124389';
+  par.sections = [7,34,39,42];
   par.R    = 8314.4626;     % Universl gas constant (J/(kmol K)
   par.Mw = 44.0098;         % Molar mass (kg/kmol)
   par.Tc   = 304.1282;      % Critical temperature (K)
@@ -15,8 +17,8 @@ function par = CO2parameters
   par.rhoc = 1/par.vc;      % Critical density (kmol/m3)
   par.Tt = 216.592;         % Triple point temperature (K)
   par.pt = 5.1796e5;        % Triple point pressure
-  par.vlt = 0.037345;       % Liquid molar volume at triple point (m3/kmol)
-  par.vvt = 3.1982;         % Vapur phase molar volume at triple point
+%   par.vlt = 0.037345;       % Liquid molar volume at triple point (m3/kmol)
+%   par.vvt = 3.1982;         % Vapur phase molar volume at triple point
 %   % Thermodynamic properties used by Span & Wagner:
 %   par.R = 8314.51;
 %   par.rhoc = 467.6/par.Mw;   
@@ -38,7 +40,7 @@ function par = CO2parameters
     0.08327678];
 %   par.ig_a(1:2) = [-6.1248;15.9926];  % Change to NIST reference state
     par.ig_a(1:2) = par.ig_a(1:2) + [-120543;73334]/par.R;
-  par.ig_theta = [
+  par.ig_b = [
     3.15163 
     6.11190 
     6.77708 
@@ -214,44 +216,22 @@ par.B = [0.3;0.3;1];
 par.C = [10;10;12.5];
 par.D = 275*ones(3,1);
 
-  % Vapour-liquid sturation curvem: 
-  % theta = 1-T/Tc;
-  % psat = exp(polyval(pp,theta))*th.pc;
- par.pp = [  
-     1.217148278410391
-    -1.895121777051658
-     1.278120856020245
-    -0.489859037994204
-     0.117748522144929
-    -0.018557665468319
-     0.001948623977944
-    -0.000150803021323
-     0.000002211550664
-    -0.000006952616685
-    -0.000000000068737]*1e6;
-  
-  % Approximate saturated liquid volume:  
-  %  vl = [theta-0.01,1,theta,thets^2,theta^3]*pvl
-  %  theta = 1 - T/Tc
-  par.pvl = [
-   0.000280540537189
-   0.054544059181170
-  -0.118761607320652
-   0.277302265884874
-  -0.289526844886868];
-
-% Approximate saturated vapour volume
-%  vv = exp([theta-0.01,1,theta,thets^2,theta^3]*pvv)
-par.pvv = [
-  -0.004915138582133
-  -1.738952741440945
-  10.375964722367650
- -10.202370799181420
-  32.606547750136109];
+% Vapour-liquid saturation properties: 
+% Pressure
+par.as    = [-7.0602087, 1.9391218,-1.6463597,-3.2995634];
+par.ase = [1;1.5;2;4]; 
+% Liquid volume
+par.bs = [1,1.83056,-1.55652,17.72784,-71.39499,170.18692,-237.26564,...
+  178.57019,-55.65447];
+par.bse = (0:8)'/3;
+% Vapour volume
+par.cs = [0.03520,  5.45521,-19.21051,140.49716,-564.97860,1473.50053,...
+        -2300.80720,1981.73022,-695.9773];
+par.cse = (0:8)'/2;
 
 % Vapour/solid saturation curve (eq. 3.12 in Span & Wagner)
-par.as = [-14.740846, 2.4327015,  -5.3061778];
-par.es = [1,1.9,2.9];  % Exponentials
+par.am = [-14.740846, 2.4327015,  -5.3061778];
+par.ame = [1;1.9;2.9];  % Exponentials
 end
 
   

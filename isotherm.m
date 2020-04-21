@@ -3,7 +3,7 @@ function [p,vl,vv,ps] = isotherm(th,T,v)
 %   T: Temperature (K)
 %   v: Array of molar volumes (m3/kmol)
 % Output:
-%   p:  Array of pressures at contant temperature T, as function of v
+%   p:  Array of pressures at constant temperature T, as function of v
 %  If T < Tc:
 %   vl,vv: Liquid and vapour molar volumes at ps.
 %   ps: Saturation pressure at T
@@ -30,9 +30,7 @@ function [p,vl,vv,ps] = isotherm(th,T,v)
   vv = NaN;
   ps = NaN;
   if T < th.Tc
-    [ps,liq,vap] = th.saturation(T);
-    vl = liq.v;
-    vv = vap.v;
+    [ps,vl,vv] = th.saturation(T);
   end
 end
   

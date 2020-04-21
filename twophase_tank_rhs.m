@@ -24,7 +24,7 @@ function dzdt = twophase_tank_rhs(th,t,z,par)
   vl = z(3); % Liquid molar volume at equilibrium
   vv = z(4); % Vapour molar volume at equilibrium
   
-  [~,ps_T] = th.psat(T);
+  [~,~,~,ps_T] = th.saturation(T);
   
   % Liquid phase
   th.Tvcalc(T,vl)
