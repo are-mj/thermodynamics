@@ -229,9 +229,13 @@ par.cs = [0.03520,  5.45521,-19.21051,140.49716,-564.97860,1473.50053,...
         -2300.80720,1981.73022,-695.9773];
 par.cse = (0:8)'/2;
 
-% Vapour/solid saturation curve (eq. 3.12 in Span & Wagner)
-par.am = [-14.740846, 2.4327015,  -5.3061778];
-par.ame = [1;1.9;2.9];  % Exponentials
+% Vapour/solid sublimation curve(eq. 3.12 in Span & Wagner)
+par.sublima = [-14.740846, 2.4327015,  -5.3061778];
+par.sublime = [1;1.9;2.9];  % Exponentials
+
+% Liquid/solid melting curve
+par.melta = [1955.5390 2055.4593];
+par.melte = [1;2];  % Exponentials
 end
 
   
