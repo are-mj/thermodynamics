@@ -30,7 +30,7 @@ function par = H2parameters()
   % Int. J. Hydrogen Energy, 34 (2009) 6712–6721
   nn = 0;  % Missing values
   A =[
-  %   N           t       d p   phi  beta  gamma      D
+  %   N           t       d c   phi  beta  gamma      D
   1  -6.93643     0.6844  1 0   nn     nn     nn     nn
   2   0.01        1       4 0   nn     nn     nn     nn
   3   2.1101      0.989   1 0   nn     nn     nn     nn

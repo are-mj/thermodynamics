@@ -8,15 +8,12 @@ function res_out = helmholtz(T,v,par,max_order)
 % Output:
 %   res_out = [a,a_T,a_v,a_TT,a_Tv,a_vv]  (a_xy = d^2a/dxdy)
 %    if max_order = 3: res_out = [res_out,a_TTT,a_TTv,a_Tvv,a_vvv]
-% 
-% Requires: H2Oparameters.m
 
 % March 2020, Are Mjaavatten
 
   if nargin < 4
     max_order = 2;
   end
-%   par = H2Oparameters;
   
   % Reduced temperature and density:
   tau = par.Tc/T;
@@ -25,11 +22,16 @@ function res_out = helmholtz(T,v,par,max_order)
   delta_v = -delta/v;
   delta_vv = -2*delta_v/v;
   
-  res_ig = phi_ig(tau,delta,par,max_order);
+  if isfield(par,'phi_ig')
+    res_ig = par.phi_ig(tau,delta,par,max_order);
+  else
+    res_ig = phi_ig(tau,delta,par,max_order);
+  end
+
   res_r = phi_r(tau,delta,par,max_order);
   res = res_ig+res_r;
 
-  % Reduced helmholts free energy and deriventive w.r.t tau (t) and delta (d)
+  % Reduced Helmholts free energy and deriventive w.r.t tau (t) and delta (d)
   phi = res(1);
   phi_t = res(2);
   phi_d = res(3);
@@ -67,10 +69,16 @@ end
 
 function res = phi_ig(tau,delta,par,max_order)
   a = par.ig_a;
-  theta = par.ig_b;
-  A = a(4:8)';
-  B = theta';
-  y = exp(-tau*B)';
+  if isfield(par,'ig_b')
+    theta = par.ig_b;
+    A = a(4:8)';
+    B = theta';
+    y = exp(-tau*B)';
+  else
+    A     = 0;
+    B     = 0;
+    y     = 0;
+  end
   phi = log(delta) + a(1) + a(2)*tau + a(3)*log(tau) + A*log(1-y);
   phi_t = a(2) + a(3)/tau + A.*B*(y./(1-y));
   phi_d = 1/delta;
@@ -90,25 +98,15 @@ function res = phi_r(tau,delta,par,max_order)
 % Create phi_r as a sum of contributions phi_r = S1 + S2 + S3 + S4
   pos = par.sections;
   dpos = diff(pos);
-  four_sections = length(pos)>3;
-  n = par.n(1:pos(3));
+  sections = length(pos);
+  if sections >2
+    n = par.n(1:pos(3));
+  else
+    n = par.n(1:pos(2));
+  end
   t = par.t;
   d = par.d;
   c = par.c;
-  alpha = par.alpha;
-  beta3 = par.beta;
-  epsilon = par.epsilon;
-  gamma = par.gamma;  
-  if four_sections
-    a = par.a;
-    b = par.b;
-    beta3 = par.beta(1:dpos(2));
-    beta4 = par.beta(dpos(2)+(1:dpos(3)));  
-    A = par.A(1);  % exploit that A(1:3) = constant
-    B = par.B;
-    C = par.C;
-    D = par.D; 
-  end
    
   s = n.*delta.^d.*tau.^t;
   s_t = s.*t/tau;
@@ -138,23 +136,41 @@ function res = phi_r(tau,delta,par,max_order)
   S2_dd = s_dd(i2)'*e + 2*s_d(i2)'*e_d + s(i2)'*e_dd;
   res2 = [S2,S2_t,S2_d,S2_tt,S2_td,S2_dd];
   
-  o = exp(-alpha.*(delta-epsilon).^2 - beta3.*(tau-gamma).^2);
-  o_t = -2*beta3.*(tau-gamma).*o;
-  o_d = -2*alpha.*(delta-epsilon).*o;
-  o_tt = -2*beta3.*(o+(tau-gamma).*o_t);
-  o_td = -2*beta3.*(tau-gamma).*o_d;
-  o_dd = -2*alpha.*(o+(delta-epsilon).*o_d);
- 
-  i3 = (pos(2)+1):pos(3);
-  S3 = sum(s(i3).*o);
-  S3_t = sum(s_t(i3).*o+s(i3).*o_t);
-  S3_d = sum(s_d(i3).*o+s(i3).*o_d);
-  S3_tt = sum(s_tt(i3).*o + 2*s_t(i3).*o_t + s(i3).*o_tt);
-  S3_td = sum(s_td(i3).*o + s_t(i3).*o_d + s_d(i3).*o_t + s(i3).*o_td);
-  S3_dd = sum(s_dd(i3).*o + 2*s_d(i3).*o_d + s(i3).*o_dd);
-  res3 = [S3,S3_t,S3_d,S3_tt,S3_td,S3_dd];
+  if sections > 2
+    alpha = par.alpha;
+    beta3 = par.beta(1:dpos(2));
+    epsilon = par.epsilon;
+    gamma = par.gamma;     
+    
+    o = exp(-alpha.*(delta-epsilon).^2 - beta3.*(tau-gamma).^2);
+    o_t = -2*beta3.*(tau-gamma).*o;
+    o_d = -2*alpha.*(delta-epsilon).*o;
+    o_tt = -2*beta3.*(o+(tau-gamma).*o_t);
+    o_td = -2*beta3.*(tau-gamma).*o_d;
+    o_dd = -2*alpha.*(o+(delta-epsilon).*o_d);
 
-  if four_sections
+    i3 = (pos(2)+1):pos(3);
+    S3 = sum(s(i3).*o);
+    S3_t = sum(s_t(i3).*o+s(i3).*o_t);
+    S3_d = sum(s_d(i3).*o+s(i3).*o_d);
+    S3_tt = sum(s_tt(i3).*o + 2*s_t(i3).*o_t + s(i3).*o_tt);
+    S3_td = sum(s_td(i3).*o + s_t(i3).*o_d + s_d(i3).*o_t + s(i3).*o_td);
+    S3_dd = sum(s_dd(i3).*o + 2*s_d(i3).*o_d + s(i3).*o_dd);
+    res3 = [S3,S3_t,S3_d,S3_tt,S3_td,S3_dd];
+  else
+    res3 = zeros(1,6);
+  end
+
+  if sections > 3
+    a = par.a;
+    b = par.b;
+%     beta3 = par.beta(1:dpos(2));
+    beta4 = par.beta(dpos(2)+(1:dpos(3)));  
+    A = par.A(1);  % exploit that A(1:3) = constant
+    B = par.B;
+    C = par.C;
+    D = par.D; 
+    
     if abs(delta-1)<1e-15
       resGamma = ones(dpos(3),1)*[0,0,0,Inf,0,0];
       if max_order > 2
@@ -232,24 +248,28 @@ function res = phi_r(tau,delta,par,max_order)
     S2_ddd = s_ddd(i2)'*e + 3*s_dd(i2)'*e_d + 3*s_d(i2)'*e_dd ...
            + s(i2)'*e_ddd;
     res2 = [res2,S2_ttt,S2_ttd,S2_tdd,S2_ddd];
-
-    o_ttt = -2*beta3.*(2*o_t+(tau-gamma).*o_tt);
-    o_ttd = -2*beta3.*(o_d+(tau-gamma).*o_td);
-    o_tdd = -2*alpha.*(o_t+(delta-epsilon).*o_td);
-    o_ddd = -2*alpha.*(2*o_d+(delta-epsilon).*o_dd);
     
-    S3_ttt = sum(s_ttt(i3).*o + 3*s_tt(i3).*o_t + 3*s_t(i3).*o_tt ...
-           + s(i3).*o_ttt);
-    S3_ttd = sum(s_ttd(i3).*o +s_tt(i3).*o_d ...
-                 + 2*s_td(i3).*o_t + 2*s_t(i3).*o_td ...
-                 + s_d(i3).*o_tt + s(i3).*o_ttd);
-    S3_tdd = sum(s_tdd(i3).*o + s_dd(i3).*o_t ...
-                 + 2*s_td(i3).*o_d + 2*s_d(i3).*o_td...
-                 + s_t(i3).*o_dd + + s(i3).*o_tdd);
-    S3_ddd = sum(s_ddd(i3).*o + 3*s_dd(i3).*o_d + 3*s_d(i3).*o_dd ...
-           + s(i3).*o_ddd);   
-    res3 = [res3,S3_ttt,S3_ttd,S3_tdd,S3_ddd];
-    if four_sections
+    if sections > 2
+      o_ttt = -2*beta3.*(2*o_t+(tau-gamma).*o_tt);
+      o_ttd = -2*beta3.*(o_d+(tau-gamma).*o_td);
+      o_tdd = -2*alpha.*(o_t+(delta-epsilon).*o_td);
+      o_ddd = -2*alpha.*(2*o_d+(delta-epsilon).*o_dd);
+
+      S3_ttt = sum(s_ttt(i3).*o + 3*s_tt(i3).*o_t + 3*s_t(i3).*o_tt ...
+             + s(i3).*o_ttt);
+      S3_ttd = sum(s_ttd(i3).*o +s_tt(i3).*o_d ...
+                   + 2*s_td(i3).*o_t + 2*s_t(i3).*o_td ...
+                   + s_d(i3).*o_tt + s(i3).*o_ttd);
+      S3_tdd = sum(s_tdd(i3).*o + s_dd(i3).*o_t ...
+                   + 2*s_td(i3).*o_d + 2*s_d(i3).*o_td...
+                   + s_t(i3).*o_dd + + s(i3).*o_tdd);
+      S3_ddd = sum(s_ddd(i3).*o + 3*s_dd(i3).*o_d + 3*s_d(i3).*o_dd ...
+             + s(i3).*o_ddd);   
+      res3 = [res3,S3_ttt,S3_ttd,S3_tdd,S3_ddd];
+    else
+      res3 = zeros(1,10);
+    end
+    if sections> 3
       if abs(delta-1)>1e-15
         x_ddd = (1/beta4-1)/(delta-1)*(x_dd-x_d/(delta-1));
         y_ddd = (2*a-1)/(delta-1).*(y_dd-y_d/(delta-1));
