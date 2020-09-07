@@ -1,6 +1,6 @@
 # thermodynamics
 
-This repository contains Matlab implementations of high-accuracy thermodynamic models from the litterature.  So far for hydrogen, H2O, and CO2. I also supply a Matlab thermodynamic object 'thermo' that simplifies working with the models.
+This repository contains Matlab implementations of high-accuracy thermodynamic models from the litterature, together with the 'thermo' class for calculating thermodynamic variables.  Currenty, available species are H2, N2, O2, Ar, H2O, and CO2, together with Air treated as a single pseudo species. 
 
 Main files:
 
@@ -18,7 +18,13 @@ H2parameters.m: Thermodynamic and model parameters for pure hydrogen.
 H2Oparameters.m: Thermodynamic and model parameters for pure H2O.
    Ref: W. Wagner, A. Pruss. Journal of Physical and Chemical Reference Data, 2002: 387-535. 
 
-The model and parameters are the same as used by NIST for calculating Thermophysical Properties of Fluid Systems
+N2parameters.m, O2parameters.m, Arparameters.m: Thermodynamic and model parameters for pure nitrogen, oxygen and argon
+   Ref: Lemmon et al.:  Phys. Chem. Reference Data 29, 331 (2000)
+   
+Airparameters.m: Thermodynamic and model parameters for air as a singke pseudo species
+   Ref: Lemmon et al.:  Phys. Chem. Reference Data 29, 331 (2000)
+
+With the exception of Air, the model and parameters are the same as used by NIST for calculating Thermophysical Properties of Fluid Systems
    https://webbook.nist.gov/chemistry/fluid/
 
 Use the Matlab help command for details (e.g. help thermo)
