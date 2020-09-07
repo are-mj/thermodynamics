@@ -1,9 +1,12 @@
 function par = Airparameters  
-% Parameters for termodynamic model for air as a pseudo species
-% Ref: Lemmon,  E.W.;  Jacobsen,  R.T.;  Penoncello,  S.G.;  Friend,  D.G. 
+%Parameters for termodynamic model for air as a pseudo species
+%Ref: Lemmon,  E.W.;  Jacobsen,  R.T.;  Penoncello,  S.G.;  Friend,  D.G. 
 % Thermodynamic  properties  of  air  and  mixtures  of  nitrogen,  argon, 
 % and oxygen from 60 to 2000 K at pressures to 2000 MPa. 
 % J. Phys. Chem. Ref. Data. 2000, 29, 331. 
+%The parameter tables were copied from: Leen van der Ham: An empirical 
+%  Helmholtz energy based model for the calculation of thermodynamic 
+%  properties of N2-Ar-O2 mixtures, NTNU, 2008
 
   par.species = 'Air';
   x_air = [0.7812,0.2096,0.0092];  % N2, O2 and Ar mole fractions

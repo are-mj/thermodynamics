@@ -1,4 +1,11 @@
 function par = N2parameters  
+% Ref: Span,R.;Lemmon,E.W.;Jacobsen,R.T.;Wagner,W.;Yokozeki,A.
+%  A reference equation of state for the thermodynamic properties of  
+%  nitrogen fortemperatures from 63.151 to 1000 K and pressures to 2200 MPa. 
+%  J. Phys. Chem. Ref. Data.2000, 29, 1361. 
+% The parameter tables were copied from: Leen van der Ham: An empirical 
+%  Helmholtz energy based model for the calculation of thermodynamic 
+%  properties of N2-Ar-O2 mixtures, NTNU, 2008
 
   par.species = 'N2';
   par.sections = [6,32,36];

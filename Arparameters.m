@@ -1,5 +1,12 @@
 function par = Arparameters  
-% Parameters from van der Ham
+%Ref: Tegeler,Ch.;Span,R.;Wagner,W.: A new equation of state for argon 
+% covering the fluid region for temperatures from the melting line to 
+% 700 K at pressures up to 1000 MPa. 
+% J. Phys. Chem. Ref. Data. 1999, 28, 779. 
+% The parameter tables were copied from: Leen van der Ham: An empirical 
+%  Helmholtz energy based model for the calculation of thermodynamic 
+%  properties of N2-Ar-O2 mixtures, NTNU, 2008
+
   par.species = 'Ar';
   par.sections = [12,37,41];
   par.R    = 8314.3714;     % Universl gas constant (J/(kmol K)

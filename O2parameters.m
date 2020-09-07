@@ -1,5 +1,11 @@
 function par = N2parameters  
-% Parameters from van der Ham
+%Ref: Schmidt,R.;Wagner,W.: A new form of the equation of state for pure 
+% substances and its application to oxygen. Fluid Phase Equilibirua.
+% 1985, 19, 175. 
+% The parameter tables were copied from: Leen van der Ham: An empirical 
+%  Helmholtz energy based model for the calculation of thermodynamic 
+%  properties of N2-Ar-O2 mixtures, NTNU, 2008
+
   par.species = 'O2';
   par.sections = [13,32];
   par.R    = 8314.3714;     % Universl gas constant (J/(kmol K)
