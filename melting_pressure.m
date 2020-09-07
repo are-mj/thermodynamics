@@ -5,4 +5,3 @@ beta = T/par.Tt-1;
 pm = par.pt*(1+par.melta(1)*beta + par.melta(2)*beta.^2);
 
 end
-

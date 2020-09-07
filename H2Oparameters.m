@@ -3,7 +3,7 @@ function par = H2Oparameters
 % and with the 'thermo' thermodynamic object.  
 % Sources: 
 %    General thermodynamic properties: NIST webbook
-%    Thermodynaic model parameters:  
+%    Thermodynamic model parameters:  
 %      W.Wagner, A.Pruss: J. Phys. Chem. Ref. Data 31, 387 (2002);
 
   par.species = 'H2O';
@@ -311,6 +311,3 @@ par.sublime = [-1.5,-1.25];  % Exponents
 par.melta = [-0.626e6,0.197135e6];
 par.melte = [-3,21.2];  % Exponents  
 end
-
-
-  
