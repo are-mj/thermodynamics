@@ -87,17 +87,20 @@ classdef thermo < handle
         error(['You must specify the chemical species, ', ...
           'e.g. th = thermo(''H2'')']);
       end
-      th.helmholtz = @helmholtz;
-      switch species
-        case 'H2'
-          th.par = H2parameters;
-        case 'CO2'
-          th.par = CO2parameters;
-        case 'H2O'
-          th.par = H2Oparameters;
-        otherwise
-          error('Currently available species are: H2, CO2, H2O')
+      species_list = {'H2','CO2','H2O','N2','O2','Ar','Air'};
+      sp = find(strcmp(species_list,species),1);
+      par = [];
+      if isempty(sp)
+        fprintf('''%s'' not found. Currently available species are:\n  '...
+          ,species);
+        for i = 1:length(species_list)-1
+          fprintf(' ''%s'', ',species_list{i})
+        end
+        fprintf('and ''%s''\n ',species_list{end});
+        error('Species not found')
       end
+      th.par = feval([species,'parameters']);
+      th.helmholtz = @helmholtz;
       % Unpack general parameters:
       th.species = th.par.species;
       th.R    = th.par.R;      % Universal gas constant (J/(kmol K)
@@ -172,11 +175,11 @@ classdef thermo < handle
     end
 
     function Tpcalc(th,T,p,v0)
-    % Tpcalc(T,p,v0) : Solves of p(T,v) = p by Newton's method
+    % Tpcalc(T,p,v0) : Solves p(T,v) = p by Newton's method
 	  % v0: optional starting point for iteration. Default: Ideal gas value
-    if nargin < 4
-      v0 = th.R*T/p;  % Ideal gas
-    end     
+      if nargin < 4
+        v0 = th.R*T/p;  % Ideal gas
+      end     
       MaxIter = 25;
       vv = v0;
       for i = 1:MaxIter
@@ -192,7 +195,7 @@ classdef thermo < handle
         end
         vv = vv - dv;
       end
-      error(sprintf('No convergence for T = %6.2f, p = %10.0f',T,p));
+      error('No convergence for T = %6.2f, p = %10.0f',T,p);
     end
 
     function phcalc(th,p,h)
@@ -262,11 +265,12 @@ classdef thermo < handle
 
     function [ps,vl,vv,ps_T] = saturation(th,T)
     % saturation(T): Values along the vapour/liquid saturation line
-    %  T:    Temperature (K)
-    %  ps:   Saturation pressure (Pa)
-    %  vl:   Saturated liquid molar volume (M3/kmol)
-    %  vv:   Saturated vapour molar volume (M3/kmol)
-    %  ps_T: Derivative of pd (dps/dT)
+    %   T:    Temperature (K)
+    %  Output:
+    %   ps:   Saturation pressure (Pa)
+    %   vl:   Saturated liquid molar volume (M3/kmol)
+    %   vv:   Saturated vapour molar volume (M3/kmol)
+    %   ps_T: Derivative of pd (dps/dT)
       theta  = 1-T/th.Tc;
       as = th.par.as;
       ase = th.par.ase;
@@ -392,7 +396,6 @@ classdef thermo < handle
         'Calculate thermo, given temperature and pressure'
         'Calculate thermo, given pressure and molar enthalpy'
         'Calculate thermo, given pressure and molar entropy'
-        'Saturation pressure for given temperature'
         'Saturation pressure, saturated liquid and vapour thermo objects'
         'Return struct with all thermodynamin properties'
         'List thermo properties'

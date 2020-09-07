@@ -73,4 +73,3 @@ function psub = H2Osublimation_pressure(T,par)
   e = par.sublime;  
   xx = a(1)*(1-theta.^e(1))+a(2)*(1-theta.^e(2));
   psub = par.pt*exp(xx);
-end

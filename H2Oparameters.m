@@ -1,9 +1,9 @@
 function par = H2Oparameters
-% Parameters for H2O to be used with the H2Ohelmholtz.m
+% Parameters for H2O to be used with helmholtz.m
 % and with the 'thermo' thermodynamic object.  
 % Sources: 
 %    General thermodynamic properties: NIST webbook
-%    Thermodynaic model parameters:  
+%    Thermodynamic model parameters:  
 %      W.Wagner, A.Pruss: J. Phys. Chem. Ref. Data 31, 387 (2002);
 
   par.species = 'H2O';
@@ -305,12 +305,9 @@ function par = H2Oparameters
   
 % Vapour/solid sublimation curve(eq. 3.21 in Wagner & Pruss)
 par.sublima = [-13.928169, 34.7078238];
-par.sublime = [-1.5,-1.25];  % Exponentials
+par.sublime = [-1.5,-1.25];  % Exponents
 
 % Liquid/solid melting curve  ( Eq. 2.16 in Wagner & Pruss)
 par.melta = [-0.626e6,0.197135e6];
-par.melte = [-3,21.2];  % Exponentials  
+par.melte = [-3,21.2];  % Exponents  
 end
-
-
-  

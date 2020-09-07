@@ -231,11 +231,14 @@ par.cse = (0:8)'/2;
 
 % Vapour/solid sublimation curve(eq. 3.12 in Span & Wagner)
 par.sublima = [-14.740846, 2.4327015,  -5.3061778];
-par.sublime = [1;1.9;2.9];  % Exponentials
+par.sublime = [1;1.9;2.9];  % Exponents
 
-% Liquid/solid melting curve
-par.melta = [1955.5390 2055.4593];
-par.melte = [1;2];  % Exponentials
+% Liquid/solid melting curve.  Fitted to curve from Giordano et al.,
+% Melting curve ... of carbon dioxide ...,J. Chem. Phys. vol 125, 2006
+% https://hal.archives-ouvertes.fr/hal-00088068
+% Corrected for differences in triple point values
+par.melta = [1984.8038, 1776.0165];
+par.melte = [1;2];  % Exponents
 end
 
   
