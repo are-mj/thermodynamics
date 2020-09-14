@@ -27,9 +27,12 @@ function res_out = helmholtz(T,v,par,max_order)
   else
     res_ig = phi_ig(tau,delta,par,max_order);
   end
-
-  res_r = phi_r(tau,delta,par,max_order);
-  res = res_ig+res_r;
+  if isfield(par,'n')
+    res_r = phi_r(tau,delta,par,max_order);
+    res = res_ig+res_r;
+  else  % ideal gas
+    res = res_ig;
+  end
 
   % Reduced Helmholts free energy and deriventive w.r.t tau (t) and delta (d)
   phi = res(1);

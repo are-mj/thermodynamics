@@ -87,9 +87,8 @@ classdef thermo < handle
         error(['You must specify the chemical species, ', ...
           'e.g. th = thermo(''H2'')']);
       end
-      species_list = {'H2','CO2','H2O','N2','O2','Ar','Air'};
+      species_list = {'H2','CO2','H2O','N2','O2','Ar','Air','ig'};
       sp = find(strcmp(species_list,species),1);
-      par = [];
       if isempty(sp)
         fprintf('''%s'' not found. Currently available species are:\n  '...
           ,species);
@@ -99,9 +98,14 @@ classdef thermo < handle
         fprintf('and ''%s''\n ',species_list{end});
         error('Species not found')
       end
-      th.par = feval([species,'parameters']);
-      th.helmholtz = @helmholtz;
-      % Unpack general parameters:
+      if strcmp(species,'ig')
+        Mw = input('Ideal gas molar mass (kg/kmol)? ');
+        gamma = input('Ideal gas heat capacity ratio? ');
+        th.par = igparameters(Mw,gamma);
+      else
+        th.par = feval([species,'parameters']);
+      end
+        % Unpack general parameters:
       th.species = th.par.species;
       th.R    = th.par.R;      % Universal gas constant (J/(kmol K)
       th.Tc   = th.par.Tc;     % Critical temperature (K)
@@ -112,6 +116,7 @@ classdef thermo < handle
       th.Tt   = th.par.Tt;     % Triple point temperature (K)
       th.pt   = th.par.pt;     % Triple point temperature (K)
       th.max_order = 2;
+      th.helmholtz = @helmholtz;
     end
         
     function Tvcalc(th,T,v)
@@ -179,7 +184,7 @@ classdef thermo < handle
 	  % v0: optional starting point for iteration. Default: Ideal gas value
       if nargin < 4
         v0 = th.R*T/p;  % Ideal gas
-      end     
+      end
       MaxIter = 25;
       vv = v0;
       for i = 1:MaxIter
@@ -271,6 +276,13 @@ classdef thermo < handle
     %   vl:   Saturated liquid molar volume (M3/kmol)
     %   vv:   Saturated vapour molar volume (M3/kmol)
     %   ps_T: Derivative of pd (dps/dT)
+      if T > th.Tc
+        ps = NaN;
+        vl = NaN;
+        vv = NaN;
+        ps_T = NaN;
+        return
+      end
       theta  = 1-T/th.Tc;
       as = th.par.as;
       ase = th.par.ase;

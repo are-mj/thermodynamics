@@ -13,15 +13,10 @@ function [T,p,c,v] = choked_flow(th,T0,p0)
 
 % January 2020, Are Mjaavatten
     
-    if isfield(th.par,'as')
-      ps = th.saturation(T0);
-      if p0 > ps
-        warning('CHOKED_FLOW:RANGE',...
-          'Calculation not robust in the liquid region')
-      end
-    else
-      th.Tpcalc(T0,p0);
+    if T0 < th.Tc && p < th.pc
+      warning('Calculation may not be robust near the liquid region')
     end
+    th.Tpcalc(T0,p0);
     h0 = th.h;
     s0 = th.s;    
     % Initialize with ideal gas solution:
