@@ -29,7 +29,7 @@ function par = N2parameters
      6.678326E-8
      1.012941E+0
      26.65788E+0];
-  par.phi_ig = @(tau,delta,par,max_order)phi_ig_O2(tau,delta,par,max_order);
+  par.phi_ig = @(tau,delta,par,max_order)phi_ig_N2(tau,delta,par,max_order);
   
 % van der ham Table 7
   A = [   1    9.24803575275E-01    1    0.25   0
