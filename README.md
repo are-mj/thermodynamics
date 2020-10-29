@@ -18,8 +18,11 @@ With the exception of Air and orthoH2, the models and parameters are the same as
 Use the Matlab help command for details (e.g. help thermo)
 
 Documentation:
+
 User guide for Matlab class thermo.pdf
+
 Properties from Helmholtz.pdf
+
 Shock tube model for real gases.pdf
 
 
