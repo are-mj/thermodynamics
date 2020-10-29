@@ -2,21 +2,21 @@ function phase_diagram(species)
   % Draws the bundaries between solid, liquid and gas phases in T-p diagram
   switch species
     case 'H2O'
-      par = H2Oparameters;
+      par = parameters_H2O;
       sublim = @(T) H2Osublimation_pressure(T,par);
       melt = @(T) H2Omelting_pressure(T,par);
       Tm = [linspace(260,272),linspace(272,par.Tt,500)];
       Tsub = linspace(220,par.Tt);
       ax = [220,650,2e-5,1.5e3];
     case 'CO2'
-      par = CO2parameters;
+      par = parameters_CO2;
       sublim = @(T) CO2sublimation_pressure(T,par);
       melt = @(T) CO2melting_pressure(T,par);  
       Tm = linspace(par.Tt,250);
       Tsub = linspace(160,par.Tt); 
       ax = [160,310,0.03,1500];
     otherwise
-      fprintf('Phase diagram not implemented for %s\n',species);
+      fprintf('Phase diagram implemented only for H2O and CO2\n');
       return
   end
   Ts = linspace(par.Tt,par.Tc);
@@ -73,3 +73,4 @@ function psub = H2Osublimation_pressure(T,par)
   e = par.sublime;  
   xx = a(1)*(1-theta.^e(1))+a(2)*(1-theta.^e(2));
   psub = par.pt*exp(xx);
+end

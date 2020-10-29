@@ -1,5 +1,5 @@
     function [ps,ps_T] = psat(T,par)
-    % [ps,ps_T] = psat(T,par)  Saturation pressure
+    % [ps,ps_T] = psat(T,par)  Saturation pressure.  Vectorized
     %  T:    Temperature (K)  Scalar or 1-D array
     %  par:  parameter struct or thermo object
     %  ps:   Saturation pressure (Pa)

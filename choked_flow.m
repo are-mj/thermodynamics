@@ -13,7 +13,7 @@ function [T,p,c,v] = choked_flow(th,T0,p0)
 
 % January 2020, Are Mjaavatten
     
-    if T0 < th.Tc && p < th.pc
+    if T0 < th.Tc && p0 < th.pc
       warning('Calculation may not be robust near the liquid region')
     end
     th.Tpcalc(T0,p0);

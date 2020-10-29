@@ -19,8 +19,16 @@ function x = newton(fun,x0,bounds)
       xnew = x - dx;
       lo = xnew <= bounds(:,1);
       hi = xnew >= bounds(:,2);
-      dx(lo) = (x(lo)-bounds(lo,1))/2;
-      dx(hi) = (bounds(hi,1) - x(hi))/2;
+      while any([lo;hi])
+        dx(lo) = (x(lo)-bounds(lo,1))/2;
+        dx(hi) = (bounds(hi,1) - x(hi))/2;
+        xnew = x - dx;
+        lo = xnew <= bounds(:,1);
+        hi = xnew >= bounds(:,2); 
+      end
+    end
+    if any(~isreal(dx))
+      error('Complex dx')
     end
     x = x - dx;
     if norm(f(:))<TolFun && norm(dx)<TolX

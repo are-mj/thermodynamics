@@ -76,19 +76,23 @@ classdef thermo < handle
     h_v;      % dh/dv
     g;        % Gibbs energy (J/kmol)
     c;        % Speed of sound (m/s)
-    jt;       % Joule-Thompson coefficent (dT/dp at constant h)
+    c_T;      % dc/dT
+    c_v;      % dc/dv
+    jt;       % Joule-Thompson coefficent (dT/dp at constant h)    
   end
 
   methods
-    function th = thermo(species)
+    function th = thermo(species,Mw,gamma)
     % THERMO: Create new thermodynamic object
     % Usage: th = thermo(species);
+    %     or th = thermo(species,Mw,gamma)  (For species 'ig')
       if nargin < 1
         error(['You must specify the chemical species, ', ...
           'e.g. th = thermo(''H2'')']);
       end
-      species_list = {'H2','CO2','H2O','N2','O2','Ar','Air','ig'};
-      sp = find(strcmp(species_list,species),1);
+      species_list = {'H2','orthoH2','paraH2','CO2','H2O','N2','O2' ...
+        ,'Ar','Air','ig'};
+      sp = find(strcmpi(species_list,species),1);
       if isempty(sp)
         fprintf('''%s'' not found. Currently available species are:\n  '...
           ,species);
@@ -99,11 +103,13 @@ classdef thermo < handle
         error('Species not found')
       end
       if strcmp(species,'ig')
-        Mw = input('Ideal gas molar mass (kg/kmol)? ');
-        gamma = input('Ideal gas heat capacity ratio? ');
-        th.par = igparameters(Mw,gamma);
+        if nargin <2
+          Mw = input('Ideal gas molar mass (kg/kmol)? ');
+          gamma = input('Ideal gas heat capacity ratio? ');
+        end
+        th.par = parameters_ig(Mw,gamma);
       else
-        th.par = feval([species,'parameters']);
+        th.par = feval(['parameters_',species]);
       end
         % Unpack general parameters:
       th.species = th.par.species;
@@ -167,6 +173,8 @@ classdef thermo < handle
           th.p_TT  = [];
           th.p_Tv  = [];
           th.p_vv  = [];
+          th.c_T   = [];
+          th.c_v   = [];          
         end
       else
         th.f_TTT = res(7);
@@ -175,7 +183,13 @@ classdef thermo < handle
         th.f_vvv = res(10);
         th.p_TT = -th.f_TTv;
         th.p_Tv = -th.f_Tvv;
-        th.p_vv = -th.f_vvv; 		
+        th.p_vv = -th.f_vvv; 	
+        % Derivatives of c:
+        th.c_T = v^2/th.Mw*(th.f_Tvv-2*th.f_Tv/th.f_TT*th.f_TTv ...
+          + th.f_Tv^2/th.f_TT^2*th.f_TTT)/2/th.c;
+    	  th.c_v = (2*v/th.Mw*(th.f_vv-th.f_Tv^2/th.f_TT) ...
+          + v^2/th.Mw*(th.f_vvv-2*th.f_Tv/th.f_TT*th.f_Tvv ...
+          + th.f_Tv^2/th.f_TT^2*th.f_TTv))/2/th.c;          
       end
     end
 
@@ -276,11 +290,15 @@ classdef thermo < handle
     %   vl:   Saturated liquid molar volume (M3/kmol)
     %   vv:   Saturated vapour molar volume (M3/kmol)
     %   ps_T: Derivative of pd (dps/dT)
+      ps = NaN;
+      vl = NaN;
+      vv = NaN;
+      ps_T = NaN;  
+      if ~isfield(th.par,'as')
+        error('Saturation data for %s are missing',th.species)
+      end
       if T > th.Tc
-        ps = NaN;
-        vl = NaN;
-        vv = NaN;
-        ps_T = NaN;
+        warning('Temperature T = %0.2f is above the critical temperature tC = %.2f',T,th.Tc)
         return
       end
       theta  = 1-T/th.Tc;
@@ -332,11 +350,9 @@ classdef thermo < handle
   
   methods(Static)
 
-
-
     function properties
     % PROPERTIES: Displays a list of all propetries of the thermo class
-      names = {'R','species','Mw','Tc','pc','rhoc','Tt','par'};
+      names = {'R','species','Mw','Tc','pc','rhoc','Tt','par','max_order'};
       text = {
         'Universal gas constant (J/kmol/K)'	
         'Name of current species (i.e. ''H2'')'
@@ -346,18 +362,17 @@ classdef thermo < handle
         'critical density (kmol/m3)'
         'Triple point temperature, K'
         'Parameters from Leachman et al. (2005)'
+        'Maximum derivative order (default: 2)'
           };
       fprintf('%12s\n','Parameters:')
       fprintf('%10s   %-50s\n','Name','Description');
       for i = 1:length(names)
           fprintf('%10s : %-50s\n',names{i},text{i});
       end  
-      fprintf('           %-50s\n',text{end});
 
-      names = {'T','v','f','f_T','f_v','f_TT','f_Tv','f_vv','f_TTT',...
-        'f_TTv','f_Tvv','f_vvv','p','p_T','p_v','p_TT','p_Tv','p_vv',...
-        'u','u_T','u_v','cv','cp','s','s_T','s_v','h','h_T','h_v','g'...
-        'c','jt'};
+      names = {'T','v','f','f_T','f_v','f_TT','f_Tv','f_vv','p','p_T',...
+        'p_v','p_TT','p_Tv','p_vv','u','u_T','u_v','cv','cp','s','s_T',...
+        's_v','h','h_T','h_v','g','c','jt'};
       text = {
         'Temperature (K)'
         'Volume (m3/kmol)'
@@ -367,10 +382,6 @@ classdef thermo < handle
         'd2^f/dT^2 = -ds/dT'
         'd2^f/dTdv = d2^f/dvdT = -ds/dv = -dp/dT'
         'd^2f/dv^2  = -dp/dv'
-        'd^3f/dT^3'
-        'd^3f/dT^2dv'
-        'd^3f/dTdv^2'
-        'd^3/dv*3'
         'Pressure (Pa)'
         'dp/dT'
         'dp/dv;'
@@ -392,11 +403,25 @@ classdef thermo < handle
         'Speed of sound (m/s)'
         'Joule-Thompson coefficent (dT/dp at constant h)'
         };
+      names3 = {'f_TTT','f_TTv','f_Tvv','f_vvv','c_T','c_v'};      
+      text3 = {
+        'd^3f/dT^3'
+        'd^3f/dT^2dv'
+        'd^3f/dTdv^2'
+        'd^3/dv*3'
+        'dc/T'
+        'dc/dv'
+        };
       fprintf('\n Properties:\n')
       fprintf('%10s   %-50s\n','Name','Description');
       for i = 1:length(names)
           fprintf('%10s : %-50s\n',names{i},text{i});
       end
+      fprintf('\n\tProperties that are calculated if max_order = 3\n')
+      fprintf('%10s   %-50s\n','Name','Description');
+      for i = 1:length(names3)
+          fprintf('%10s : %-50s\n',names3{i},text3{i});
+      end      
     end
 
     function methods

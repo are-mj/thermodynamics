@@ -73,8 +73,9 @@ end
 function res = phi_ig(tau,delta,par,max_order)
   a = par.ig_a;
   if isfield(par,'ig_b')
+    N = numel(par.ig_a);
     theta = par.ig_b;
-    A = a(4:8)';
+    A = a(4:N)';
     B = theta';
     y = exp(-tau*B)';
   else
