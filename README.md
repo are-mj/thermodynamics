@@ -21,9 +21,9 @@ Use the Matlab help command for details (e.g. help thermo)
 
 - User guide for Matlab class thermo.pdf
 
-Properties from Helmholtz.pdf
+- Properties from Helmholtz.pdf
 
-Shock tube model for real gases.pdf
+- Shock tube model for real gases.pdf
 
 
 [![View H2 and CO2 thermodynamics on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://se.mathworks.com/matlabcentral/fileexchange/73950)
