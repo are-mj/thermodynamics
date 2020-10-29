@@ -2,7 +2,7 @@
 
 This repository contains Matlab implementations of high-accuracy thermodynamic models from the litterature, together with the 'thermo' class for calculating thermodynamic variables.  Currenty, available species are H2, paraH2, orthoH2, N2, O2, Ar, H2O, and CO2, together with Air treated as a single pseudo species. 
 
-Main files:
+**Main files:**
 
 thermo.m:  Thermodynamic object that contains methods and properties that enable the calculation of thermodynamic variables and processes.
 
@@ -17,9 +17,9 @@ With the exception of Air and orthoH2, the models and parameters are the same as
 
 Use the Matlab help command for details (e.g. help thermo)
 
-Documentation:
+**Documentation**:
 
-User guide for Matlab class thermo.pdf
+- User guide for Matlab class thermo.pdf
 
 Properties from Helmholtz.pdf
 
