@@ -8,7 +8,7 @@ thermo.m:  Thermodynamic object that contains methods and properties that enable
 
 helmholtz.m:  Helmholtz molar free energy and partial derivatives.  Used by thermo.Tvcalc
 
-parametersXX.m: Parameters for spscies XX.  Used by thermo and helmholtz.
+parametersXX.m: Parameters for spescies XX.  Used by thermo and helmholtz.
 
 A number of supplementary funcrions and examples are also included.
 
