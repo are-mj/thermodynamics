@@ -1,17 +1,18 @@
 function phase_diagram(species)
   % Draws the bundaries between solid, liquid and gas phases in T-p diagram
+  
   switch species
     case 'H2O'
       par = parameters_H2O;
+      melt = @(T) melting_pressure(T,par);
       sublim = @(T) H2Osublimation_pressure(T,par);
-      melt = @(T) H2Omelting_pressure(T,par);
       Tm = [linspace(260,272),linspace(272,par.Tt,500)];
       Tsub = linspace(220,par.Tt);
       ax = [220,650,2e-5,1.5e3];
     case 'CO2'
       par = parameters_CO2;
+      melt = @(T) melting_pressure(T,par);
       sublim = @(T) CO2sublimation_pressure(T,par);
-      melt = @(T) CO2melting_pressure(T,par);  
       Tm = linspace(par.Tt,250);
       Tsub = linspace(160,par.Tt); 
       ax = [160,310,0.03,1500];
@@ -19,7 +20,7 @@ function phase_diagram(species)
       fprintf('Phase diagram implemented only for H2O and CO2\n');
       return
   end
-  Ts = linspace(par.Tt,par.Tc);
+  Ts = linspace(par.Tt,par.Tc,500);
   ps = psat(Ts,par);
   pm = melt(Tm);
   psub = sublim(Tsub);
@@ -30,12 +31,6 @@ function phase_diagram(species)
   title(sprintf('Phase diagram for %s',species))
   grid on
   axis(ax);
-end
-
-function pm = CO2melting_pressure(T,par)
-% CO2MELTING_PRESSURE: Melting pressure as function of T for CO2
-beta = T/par.Tt-1;
-pm = par.pt*(1+par.melta(1)*beta + par.melta(2)*beta.^2);
 end
 
 function psub = CO2sublimation_pressure(T,par)
@@ -56,21 +51,15 @@ function psub = CO2sublimation_pressure(T,par)
   psub  = par.pt*exp(xx);
 end
 
-function pm = H2Omelting_pressure(T,par)
-% H2OMELTING_PRESSURE: Melting pressure as function of T for H2O
-  theta = T/par.Tt;
-  a = par.melta;
-  e = par.melte;
-  pm = par.pt*(1+a(1)*(1-theta.^e(1)) + a(2)*(1-theta.^e(2)));
-end
-
 function psub = H2Osublimation_pressure(T,par)
 % Sublimation pressure as function of temperature
-% CO2 only
-  % Eq. (3.12) in Span-Wagner
-  theta = T/par.Tt;
+% Wagner, W. et al., J. Phys. Chem. Ref. Data 40.4 (2011)
+  theta = T/par.Tt; 
   a = par.sublima;
-  e = par.sublime;  
-  xx = a(1)*(1-theta.^e(1))+a(2)*(1-theta.^e(2));
-  psub = par.pt*exp(xx);
+  b = par.sublime;
+  xx = 0;
+  for i = 1:numel(a)
+    xx = xx + a(i)*theta.^b(i);
+  end
+  psub = par.pt*exp(xx./theta);
 end
