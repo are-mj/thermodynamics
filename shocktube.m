@@ -20,9 +20,11 @@ function [T2,p2,u2,T3,T5,p5] = shocktube(T1,p1,species1,T4,p4,species4)
 %    5: Reflected shock
 %  
 % Usage example:
-%   [T2,v2,u2,T3,v3] = shocktube(300,1e5,'Air',300,100e5,'H2')
-%   th2 = thermo('Air');th2.Tvcalc(T2,v2);p2 = th2.p;
-
+%   Shock tube intial state: Hydrogen at 100 bar and air at 1 bar, 
+%    common temperature 300K. Tube closed at both ends
+%   [T2,p2,u2,T3,T5,p5] = shocktube(300,1e5,'Air',300,100e5,'H2')
+%   Shocked air: T = 132K, 22.9 bar
+%   Reflected shock: T = 240K, p = 150 bar
 % Are Mjaavatten, September 2020
 
 % Solution strategy:

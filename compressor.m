@@ -14,7 +14,7 @@ function [T2,v2,W] = compressor(th,T1,p1,p2,eta)
   if ~isa(th,'thermo')
     error('The first argument must be a thermo object')
   end
-  if p1 > th.psat(T1)
+  if p1 > psat(T1,th)
       error('Initial state must be pure gas, i.e. p1 must be <= psat(T1)')
   end
   th.Tpcalc(T1,p1);  % upstream state
