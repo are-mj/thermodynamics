@@ -303,11 +303,13 @@ function par = parameters_H2O
   par.cse = [2;4;8;18;37;71]/6;    
   % Saturated liquid volume (vv = vc/(cs*theta.^cse)
   
-% Vapour/solid sublimation curve(eq. 3.21 in Wagner & Pruss)
-par.sublima = [-13.928169, 34.7078238];
-par.sublime = [-1.5,-1.25];  % Exponents
-
-% Liquid/solid melting curve  ( Eq. 2.16 in Wagner & Pruss)
-par.melta = [-0.626e6,0.197135e6];
-par.melte = [-3,21.2];  % Exponents  
+  % Vapour/solid sublimation curve
+  % Wagner, W. et al., J. Phys. Chem. Ref. Data 40.4 (2011)
+  par.sublima = [-0.212144006e2,0.273203819e2,-0.610598130e1];
+  par.sublime = [0.333333333e-2,0.120666667e1,0.170333333e1];
+  
+  % Liquid/solid melting curve  
+  % Wagner, W. et al., J. Phys. Chem. Ref. Data 40.4 (2011)
+  par.melta = [0.119539337e7,0.808183159e5,0.333826860e4];
+  par.melte = [0.300000e1,0.257500e2,0.103750e3]; % Exponents  
 end

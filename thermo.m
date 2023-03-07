@@ -355,7 +355,7 @@ classdef thermo < handle
       names = {'R','species','Mw','Tc','pc','rhoc','Tt','par','max_order'};
       text = {
         'Universal gas constant (J/kmol/K)'	
-        'Name of current species (i.e. ''H2'')'
+        'Name of current species (e.g., ''H2'')'
         'Molar mass (kg/kmol)'
         'Critical temperature (K)'
         'critical pressure (Pa)'

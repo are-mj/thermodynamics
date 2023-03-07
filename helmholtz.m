@@ -244,7 +244,8 @@ function res = phi_r(tau,delta,par,max_order)
     S1_tdd = sum(s_tdd(i1));
     S1_ddd = sum(s_ddd(i1));
     res1 = [res1,S1_ttt,S1_ttd,S1_tdd,S1_ddd];
-    e_ddd = e_dd.*((c-1)/delta+e_d./e)-e_d.*(c-1).*(1+c.*delta.^c)/delta^2;
+    e_ddd = -c.*exp(-delta.^c).*delta.^(c-3) ...
+      .*(c.^2.*(delta.^(2*c)-3*delta.^c+1)+3*c.*(delta.^c-1)+2);
 
     S2_ttt = s_ttt(i2)'*e;
     S2_ttd = s_ttd(i2)'*e + s_tt(i2)'*e_d;
