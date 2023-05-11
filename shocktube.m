@@ -18,7 +18,9 @@ function [T2,p2,u2,T3,T5,p5] = shocktube(T1,p1,species1,T4,p4,species4)
 %    3: Driver gas between rarefaction fan and contact surface
 %    4: Undisturbed driver gas
 %    5: Reflected shock
-%  
+%
+% See also: Shock tube model for real gases.pdf
+%
 % Usage example:
 %   Shock tube intial state: Hydrogen at 100 bar and air at 1 bar, 
 %    common temperature 300K. Tube closed at both ends
