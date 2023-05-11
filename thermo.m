@@ -231,7 +231,10 @@ classdef thermo < handle
       end    
       MaxIter = 25;
       Tol = 1e-10;
-      x = [th.T;th.v];
+      % Estimate new T from current jt:
+      T1 = th.T + th.jt*(p-th.p);
+      th.Tpcalc(T1,p);
+      x = [T1;th.v];
       dx = 1000;
       for i = 1:MaxIter
         if norm(dx)<Tol
