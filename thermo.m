@@ -223,8 +223,8 @@ classdef thermo < handle
     % Input:
     %   p:   Pressure (Pa)
     %   h:   Molar enthalpy (J/kmol) 
-    % Initial T and v is taken from the thermodynamic object
-    % Use Tvcalc ot Tpcalc to define a good starting point
+    % Initial T and v are calculated from the current thermodynamic object
+    % assuming constant Joule-Thompson coefficient.
       if isempty(th.T)
         error(['Please initialise the thermo object state ' ,...
           'using either Tvcalc or Pvcalc']);
